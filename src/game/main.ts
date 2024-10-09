@@ -1,6 +1,4 @@
-import Boot from './scenes/Boot';
 import MainMenu from './scenes/MainMenu';
-import Preloader from './scenes/Preloader';
 import { AUTO, Game } from 'phaser';
 
 //  Find out more information about the Game Config at:
@@ -12,8 +10,6 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: 'game-container',
     backgroundColor: '#028af8',
     scene: [
-        Boot,
-        Preloader,
         MainMenu
     ]
 };

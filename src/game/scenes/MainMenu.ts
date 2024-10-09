@@ -1,3 +1,5 @@
+import Phaser from "phaser";
+
 export default class MainMenu extends Phaser.Scene {
     private score: number = 0;
     private clickPower: number = 1;
@@ -17,6 +19,14 @@ export default class MainMenu extends Phaser.Scene {
 
     constructor() {
         super("MainMenu");
+    }
+
+    preload ()
+    {
+        //  The Boot Scene is typically used to load in any assets you require for your Preloader, such as a game logo or background.
+        //  The smaller the file size of the assets, the better, as the Boot Scene itself has no preloader.
+
+        this.load.pack('pack', 'assets/boot-asset-pack.json');
     }
 
     editorCreate(): void {
