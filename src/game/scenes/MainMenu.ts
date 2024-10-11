@@ -1,265 +1,300 @@
+// You can write more code here
+
+/* START OF COMPILED CODE */
+
+/* START-USER-IMPORTS */
 import Phaser from "phaser";
+/* END-USER-IMPORTS */
 
 export default class MainMenu extends Phaser.Scene {
-    private score: number = 0;
-    private clickPower: number = 1;
-    private autoClickPower: number = 0; // Track the number of auto-clicks
-    private upgradeCost: number = 10;
-    private autoClickCost: number = 10; // Cost to buy auto-clicks
-    private autoClickSpeed: number = 1000; // Delay between auto-clicks (in milliseconds)
-    private scoreText: Phaser.GameObjects.Text;
-    private cookie: Phaser.GameObjects.Image;
-    private autoClickCookie: Phaser.GameObjects.Image; // Small auto-click cookie
-    private upgradeButton: Phaser.GameObjects.Text;
-    private autoClickButton: Phaser.GameObjects.Text;
-    private upgradeAutoClickPowerButton: Phaser.GameObjects.Text;
-    private upgradeAutoClickSpeedButton: Phaser.GameObjects.Text;
-    private autoClickEvent: Phaser.Time.TimerEvent;
-    private isAnimating: boolean = false; // Track if the cookie is currently animating
 
-    constructor() {
-        super("MainMenu");
-    }
+	constructor() {
+		super("Game");
 
-    preload ()
+		/* START-USER-CTR-CODE */
+		// Write your code here.
+	}
+	preload ()
     {
         //  The Boot Scene is typically used to load in any assets you require for your Preloader, such as a game logo or background.
         //  The smaller the file size of the assets, the better, as the Boot Scene itself has no preloader.
 
         this.load.pack('pack', 'assets/boot-asset-pack.json');
     }
+	/* END-USER-CTR-CODE */
 
-    editorCreate(): void {
-        // background_1
-        const background_1 = this.add.image(1000, 500, "background_1");
-        background_1.scaleX = 1;
-        background_1.scaleY = 1;
+	editorCreate(): void {
 
-        // Main cookie (big one)
-        this.cookie = this.add.image(720, 440, "cookie");
-        this.cookie.scaleX = 0.35;
-        this.cookie.scaleY = 0.35;
+		// background_1
+		const background_1 = this.add.image(767, 431, "background_1");
+		background_1.scaleX = 1.5;
+		background_1.scaleY = 1.5;
 
-        // Smaller auto-click cookie
-        this.autoClickCookie = this.add.image(700, 640, "cookie");
-		this.autoClickCookie.setVisible(false);
-        this.autoClickCookie.scaleX = 0.1;
-        this.autoClickCookie.scaleY = 0.1;
-
-        // Add click event to the main cookie
-        this.cookie.setInteractive();
-        this.cookie.on('pointerdown', () => {
-            this.incrementScore();
-            this.animateCookie(); // Trigger shared animation for the big cookie
+		// iron_ore_block
+		const iron_ore_block = this.add.image(374, 247, "iron_ore_block");
+        iron_ore_block.scaleX = 7.8;
+        iron_ore_block.scaleY = 7.8;
+        iron_ore_block.setInteractive(); // No need to use 'this' here
+        iron_ore_block.on('pointerdown', () => {
+            console.log("Iron ore block clicked!");
+            this.incrementResource('iron_ore_count'); // Pass the resource name as a string
         });
 
-        // Add score text to the scene
-        this.scoreText = this.add.text(50, 50, `Sus Score: ${this.score}`, {
-            fontSize: '32px',
-            color: '#ffffff'
-        });
+		// copper_ore_block
+		const copper_ore_block = this.add.image(807, 312, "copper_ore_block");
+		copper_ore_block.scaleX = 7.8;
+		copper_ore_block.scaleY = 7.8;
 
-        // Add upgrade button
-        this.upgradeButton = this.add.text(50, 100, `Upgrade Click (Cost: ${this.upgradeCost})`, {
-            fontSize: '28px',
-            color: '#00ff00',
-            backgroundColor: '#000000'
-        });
-        this.upgradeButton.setInteractive();
-        this.upgradeButton.on('pointerdown', () => {
-            this.upgradeClickPower();
-        });
+		// rock_block
+		const rock_block = this.add.image(432, 435, "rock_block");
+		rock_block.scaleX = 7.8;
+		rock_block.scaleY = 7.8;
 
-        // Add auto-click button
-        this.autoClickButton = this.add.text(50, 150, `Buy Auto-Click (Cost: ${this.autoClickCost})`, {
-            fontSize: '28px',
-            color: '#00ff00',
-            backgroundColor: '#000000'
-        });
-        this.autoClickButton.setInteractive();
-        this.autoClickButton.on('pointerdown', () => {
-            this.buyAutoClick();
-        });
+		// rectangle_1
+		const rectangle_1 = this.add.rectangle(1195, 290, 128, 128);
+		rectangle_1.scaleX = 1.447046084870738;
+		rectangle_1.scaleY = 4.650162957270586;
+		rectangle_1.isFilled = true;
+		rectangle_1.fillColor = 9539985;
 
-        // Create the auto-click event (but don't start it yet)
-        this.autoClickEvent = this.time.addEvent({
-            delay: this.autoClickSpeed, // Auto-click delay (1 second by default)
-            callback: this.autoClick,
-            callbackScope: this,
-            loop: true,
-            paused: true // Initially paused until auto-clicks are purchased
-        });
+		// shadowFx_1
+		rectangle_1.postFX!.addShadow(1, 1, 0.1, 1, 0, 4, 1);
 
-        // Initialize buttons for upgrading auto-click features (but keep them hidden for now)
-        this.upgradeAutoClickPowerButton = this.add.text(50, 150, `Upgrade Auto-Click Power (Cost: 1)`, {
-            fontSize: '28px',
-            color: '#00ff00',
-            backgroundColor: '#000000'
-        });
-        this.upgradeAutoClickPowerButton.setInteractive();
-        this.upgradeAutoClickPowerButton.on('pointerdown', () => {
-            this.upgradeAutoClickPower();
-        });
-        this.upgradeAutoClickPowerButton.setVisible(false); // Hidden until auto-clicker is purchased
+		// rectangle
+		const rectangle = this.add.rectangle(91, 296, 128, 128);
+		rectangle.scaleX = 1.447046084870738;
+		rectangle.scaleY = 4.650162957270586;
+		rectangle.isFilled = true;
+		rectangle.fillColor = 9539985;
 
-        this.upgradeAutoClickSpeedButton = this.add.text(50, 200, `Upgrade Auto-Click Speed (Cost: 1)`, {
-            fontSize: '28px',
-            color: '#00ff00',
-            backgroundColor: '#000000'
-        });
-        this.upgradeAutoClickSpeedButton.setInteractive();
-        this.upgradeAutoClickSpeedButton.on('pointerdown', () => {
-            this.upgradeAutoClickSpeed();
-        });
-        this.upgradeAutoClickSpeedButton.setVisible(false); // Hidden until auto-clicker is purchased
+		// shadowFx_2
+		rectangle.postFX!.addShadow(-1, 1, 0.1, 1, 0, 2, 1);
 
-        this.events.emit("scene-awake");
-    }
+		// inventory
+		const inventory = this.add.text(29, 16, "", {});
+		inventory.scaleX = 1.5;
+		inventory.scaleY = 1.5;
+		inventory.text = "Inventory";
+		inventory.setStyle({ "color": "#000000ff" });
 
-    incrementScore(): void {
-        // Increment the score by the current click power
-        this.score += this.clickPower;
+		// iron_ore
+		const iron_ore = this.add.image(25, 79, "iron_ore");
+		iron_ore.scaleX = 2;
+		iron_ore.scaleY = 2;
 
-        // Update the score text
-        this.scoreText.setText(`Sus Score: ${this.score}`);
-    }
+		// copper_ore
+		const copper_ore = this.add.image(25, 119, "copper_ore");
+		copper_ore.scaleX = 2;
+		copper_ore.scaleY = 2;
 
-    animateCookie(): void {
-        // Ensure animations don't overlap
-        if (this.isAnimating) return;
+		// rock
+		const rock = this.add.image(25, 159, "rock");
+		rock.scaleX = 2;
+		rock.scaleY = 2;
 
-        this.isAnimating = true;
+		// iron_ingot
+		const iron_ingot = this.add.image(25, 199, "iron_ingot");
+		iron_ingot.scaleX = 2;
+		iron_ingot.scaleY = 2;
 
-        // Create a tween to shrink and grow the main cookie
-        this.tweens.add({
-            targets: this.cookie,
-            scaleX: 0.2,
-            scaleY: 0.2,
-            duration: 30,
-            yoyo: true,
-            ease: 'Power1',
-            onComplete: () => {
-                this.isAnimating = false; // Reset animation flag when done
-            }
-        });
-    }
+		// copper_ingot
+		const copper_ingot = this.add.image(25, 239, "copper_ingot");
+		copper_ingot.scaleX = 2;
+		copper_ingot.scaleY = 2;
 
-    animateAutoClickCookie(): void {
-        // Create a tween for the smaller auto-click cookie to "jump" when an auto-click occurs
-        this.tweens.add({
-            targets: this.autoClickCookie,
-            y: this.autoClickCookie.y - 20, // Move up a little (jump)
-            duration: 100,
-            yoyo: true, // Return to original position
-            ease: 'Power1',
-        });
+		// concrete
+		const concrete = this.add.image(25, 279, "concrete");
+		concrete.scaleX = 2;
+		concrete.scaleY = 2;
 
-        // Trigger the main cookie animation as well
-        this.animateCookie();
-    }
+		// iron_plate
+		const iron_plate = this.add.image(25, 319, "iron_plate");
+		iron_plate.scaleX = 2;
+		iron_plate.scaleY = 2;
 
-    upgradeClickPower(): void {
-        // Check if the player has enough points to upgrade
-        if (this.score >= this.upgradeCost) {
-            // Deduct the cost from the score
-            this.score -= this.upgradeCost;
+		// copper_plate
+		const copper_plate = this.add.image(25, 359, "copper_plate");
+		copper_plate.scaleX = 2;
+		copper_plate.scaleY = 2;
 
-            // Increase the click power
-            this.clickPower += 1;
+		// iron_rod
+		const iron_rod = this.add.image(25, 399, "iron_rod");
+		iron_rod.scaleX = 2;
+		iron_rod.scaleY = 2;
 
-            // Update the score and upgrade cost
-            this.upgradeCost += 10; // You can adjust how the cost scales
+		// screws
+		const screws = this.add.image(25, 439, "screws");
+		screws.scaleX = 2;
+		screws.scaleY = 2;
 
-            // Update the score and upgrade button text
-            this.scoreText.setText(`Sus Score: ${this.score}`);
-            this.upgradeButton.setText(`Upgrade Click (Cost: ${this.upgradeCost})`);
-        }
-    }
+		// wire
+		const wire = this.add.image(25, 479, "wire");
+		wire.scaleX = 2;
+		wire.scaleY = 2;
 
-    buyAutoClick(): void {
-        // Check if the player has enough points to buy auto-clicks
-        if (this.score >= this.autoClickCost) {
-            // Deduct the cost from the score
-            this.score -= this.autoClickCost;
+		// cable
+		const cable = this.add.image(25, 519, "cable");
+		cable.scaleX = 2;
+		cable.scaleY = 2;
 
-			this.autoClickCookie.setVisible(true);
+		// iron_ore_name
+		const iron_ore_name = this.add.text(51, 62, "", {});
+		iron_ore_name.text = "Iron Ore:";
 
-            // Increase the auto-click power
-            this.autoClickPower += 1;
+		// iron_ore_count
+		const iron_ore_count = this.add.text(51, 82, "", {});
+		iron_ore_count.text = "0";
 
-            // Start the auto-click timer if it's not already running
-            if (this.autoClickEvent.paused) {
-                this.autoClickEvent.paused = false; // Start the timer
-            }
+		// copper_ore_name
+		const copper_ore_name = this.add.text(51, 102, "", {});
+		copper_ore_name.text = "Copper Ore:";
 
-            // Hide the Buy Auto-Click button
-            this.autoClickButton.setVisible(false);
+		// copper_ore_count
+		const copper_ore_count = this.add.text(51, 122, "", {});
+		copper_ore_count.text = "0";
 
-            // Show the upgrade buttons for auto-click power and speed
-            this.upgradeAutoClickPowerButton.setVisible(true);
-            this.upgradeAutoClickSpeedButton.setVisible(true);
+		// rock_name
+		const rock_name = this.add.text(51, 142, "", {});
+		rock_name.text = "Rock";
 
-            // Update the score text
-            this.scoreText.setText(`Sus Score: ${this.score}`);
-        }
-    }
+		// rock_count
+		const rock_count = this.add.text(51, 162, "", {});
+		rock_count.text = "0";
 
-    autoClick(): void {
-        // Increment the score by the auto-click power every second
-        if (this.autoClickPower > 0) {
-            this.score += this.autoClickPower;
+		// iron_ingot_name
+		const iron_ingot_name = this.add.text(51, 182, "", {});
+		iron_ingot_name.text = "Iron Ingot:";
 
-            // Update the score text
-            this.scoreText.setText(`Sus Score: ${this.score}`);
+		// iron_ingot_count
+		const iron_ingot_count = this.add.text(51, 202, "", {});
+		iron_ingot_count.text = "0";
 
-            // Animate the auto-click cookie
-            this.animateAutoClickCookie();
-        }
-    }
+		// copper_ingot_name
+		const copper_ingot_name = this.add.text(51, 221, "", {});
+		copper_ingot_name.text = "Copper Ingot:";
 
-    upgradeAutoClickPower(): void {
-        const upgradeCost = 1; // Cost to upgrade auto-click power
+		// copper_ingot_count
+		const copper_ingot_count = this.add.text(51, 241, "", {});
+		copper_ingot_count.text = "0";
 
-        // Check if the player has enough points
-        if (this.score >= upgradeCost) {
-            // Deduct the cost
-            this.score -= upgradeCost;
+		// concrete_name
+		const concrete_name = this.add.text(51, 261, "", {});
+		concrete_name.text = "Concrete:";
 
-            // Increase the auto-click power
-            this.autoClickPower += 1;
+		// concrete_count
+		const concrete_count = this.add.text(51, 281, "", {});
+		concrete_count.text = "0";
 
-            // Update the score text
-            this.scoreText.setText(`Sus Score: ${this.score}`);
-        }
-    }
+		// iron_plate_name
+		const iron_plate_name = this.add.text(51, 301, "", {});
+		iron_plate_name.text = "Iron Plate:";
 
-    upgradeAutoClickSpeed(): void {
-        const upgradeCost = 1; // Cost to upgrade auto-click speed
+		// iron_plate_count
+		const iron_plate_count = this.add.text(51, 321, "", {});
+		iron_plate_count.text = "0";
 
-        // Check if the player has enough points
-        if (this.score >= upgradeCost) {
-            // Deduct the cost
-            this.score -= upgradeCost;
+		// copper_plate_name
+		const copper_plate_name = this.add.text(51, 341, "", {});
+		copper_plate_name.text = "Copper Plate:";
 
-            // Decrease the auto-click delay (make it faster)
-            if (this.autoClickSpeed > 200) { // Set a minimum delay
-                this.autoClickSpeed -= 100;
-                this.autoClickEvent.delay = this.autoClickSpeed; // Update the auto-click event delay
-            }
+		// copper_plate_count_7
+		const copper_plate_count_7 = this.add.text(51, 361, "", {});
+		copper_plate_count_7.text = "0";
 
-            // Update the score text
-            this.scoreText.setText(`Sus Score: ${this.score}`);
-        }
-    }
+		// iron_rod_name
+		const iron_rod_name = this.add.text(51, 381, "", {});
+		iron_rod_name.text = "Iron Rod:";
 
-    create() {
-        this.editorCreate();
-    }
+		// iron_rod_count
+		const iron_rod_count = this.add.text(51, 401, "", {});
+		iron_rod_count.text = "0";
 
-    update(time: number, delta: number): void {
-        // Rotate the main cookie slowly in the center
-        if (this.cookie) {
-            this.cookie.rotation += 0.005;
-        }
+		// screws_name
+		const screws_name = this.add.text(51, 421, "", {});
+		screws_name.text = "Screws:";
+
+		// screws_count
+		const screws_count = this.add.text(51, 441, "", {});
+		screws_count.text = "0";
+
+		// copper_wire_name
+		const copper_wire_name = this.add.text(51, 461, "", {});
+		copper_wire_name.text = "Copper Wire:";
+
+		// copper_wire_count
+		const copper_wire_count = this.add.text(51, 481, "", {});
+		copper_wire_count.text = "0";
+
+		// cable_name
+		const cable_name = this.add.text(51, 501, "", {});
+		cable_name.text = "Cable:";
+
+		// cable_count
+		const cable_count = this.add.text(51, 521, "", {});
+		cable_count.text = "0";
+
+		// build_UI_name
+		const build_UI_name = this.add.text(1156, 12, "", {});
+		build_UI_name.scaleX = 1.5;
+		build_UI_name.scaleY = 1.5;
+		build_UI_name.text = "Build";
+		build_UI_name.setStyle({ "color": "#000000ff" });
+
+		// smelter
+		const smelter = this.add.image(1142, 71, "smelter");
+		smelter.scaleX = 3;
+		smelter.scaleY = 3;
+
+		// crafter
+		const crafter = this.add.image(1142, 141, "crafter");
+		crafter.scaleX = 3;
+		crafter.scaleY = 3;
+
+		// miner
+		const miner = this.add.image(1142, 211, "miner");
+		miner.scaleX = 3;
+		miner.scaleY = 3;
+
+		// smelter_name
+		const smelter_name = this.add.text(1188, 50, "", {});
+		smelter_name.text = "Smelter";
+
+		// crafter_name
+		const crafter_name = this.add.text(1188, 120, "", {});
+		crafter_name.text = "Crafter";
+
+		// miner_name
+		const miner_name = this.add.text(1196, 191, "", {});
+		miner_name.text = "Miner";
+
+		this.events.emit("scene-awake");
+	}
+
+	/* START-USER-CODE */
+
+	// Write your code here
+
+
+	create() {
+		this.editorCreate();
+
+	}
+    incrementResource(resourceName: string): void {
+    const resourceText = this.children.getByName(resourceName) as Phaser.GameObjects.Text;
+    
+    if (resourceText) {
+        const currentCount = parseInt(resourceText.text);
+        resourceText.setText((currentCount + 1).toString());
+    } else {
+        console.error(`Resource text for ${resourceName} not found`);
     }
 }
+
+
+
+	/* END-USER-CODE */
+}
+
+/* END OF COMPILED CODE */
+
+// You can write more code here
