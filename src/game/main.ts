@@ -9,6 +9,7 @@ const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
     width: 1280, // Set width to the current window width
     height: 720, 
+    pixelArt: true,
     parent: 'game-container',
     backgroundColor: '#028af8',
     scene: [

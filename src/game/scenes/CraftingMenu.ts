@@ -108,16 +108,34 @@ export default class CraftingMenu extends Phaser.Scene {
 
     // Craft the selected item
     craftItem(recipe) {
-        const inventoryScene = this.scene.get('InventoryMenu') as InventoryMenu;
+    const inventoryScene = this.scene.get('InventoryMenu') as InventoryMenu;
 
-        // Check if the player has enough resources
-        if (recipe.ingredients.every(ingredient => inventoryScene.deductFromInventory(ingredient.item, ingredient.amount))) {
-            // Add the crafted item to the Inventory
-            inventoryScene.addToInventory(recipe.outputItem, recipe.outputAmount);
+    // Check if the player has enough resources
+    if (recipe.ingredients.every(ingredient => inventoryScene.deductFromInventory(ingredient.item, ingredient.amount))) {
+        // Add the crafted item to the Inventory
+        inventoryScene.addToInventory(recipe.outputItem, recipe.outputAmount);
 
-            console.log(`Crafted ${recipe.outputAmount} ${recipe.outputItem}`);
-        } else {
-            console.log('Not enough resources to craft this item');
-        }
+        console.log(`Crafted ${recipe.outputAmount} ${recipe.outputItem}`);
+    } else {
+        const pointer = this.input.activePointer; // Get the current pointer (cursor) position
+
+        // Create the floating text near the cursor
+        const floatingText = this.add.text(pointer.worldX, pointer.worldY, "Not enough resources to craft item.", {
+            fontSize: '16px',
+            color: '#ffffff'
+        });
+
+        // Apply tween to animate the text (move up and fade out)
+        this.tweens.add({
+            targets: floatingText,
+            y: pointer.worldY - 50, // Move up by 50 pixels
+            alpha: 0,  // Fade out the text
+            duration: 1000, // 1 second animation
+            ease: 'Power1',
+            onComplete: () => {
+                floatingText.destroy(); // Destroy the text after the animation
+            }
+        });
     }
+}
 }

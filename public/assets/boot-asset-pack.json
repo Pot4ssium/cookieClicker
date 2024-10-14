@@ -82,6 +82,11 @@
                 "key": "miner"
             },
             {
+                "url": "assets/particle.png",
+                "type": "image",
+                "key": "particle"
+            },
+            {
                 "url": "assets/rock.png",
                 "type": "image",
                 "key": "rock"

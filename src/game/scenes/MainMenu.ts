@@ -8,6 +8,7 @@ import InventoryMenu from './InventoryMenu';
 /* END-USER-IMPORTS */
 
 export default class MainMenu extends Phaser.Scene {
+
 	constructor() {
 		super("Game");
 
@@ -24,6 +25,10 @@ export default class MainMenu extends Phaser.Scene {
 	/* END-USER-CTR-CODE */
 
 	editorCreate(): void {
+		const particles = this.add.particles('particle');
+
+    	// Creating particles
+    	this.miningParticles = this.add.particles('particle');
 
 		// background_1
 		const background_1 = this.add.image(767, 431, "background_1");
@@ -35,11 +40,7 @@ export default class MainMenu extends Phaser.Scene {
         iron_ore_block.scaleX = 7.8;
         iron_ore_block.scaleY = 7.8;
         iron_ore_block.setInteractive();
-
-        iron_ore_block.on('pointerdown', () => {
-            console.log("Iron ore block clicked!");
-
-            // Increment the iron ore count in the global inventory
+		iron_ore_block.on('pointerdown', () => {
             this.scene.get('InventoryMenu').addToInventory('iron_ore', 1);
 			this.scene.get('InventoryMenu').updateInventoryDisplay();
         });
@@ -121,6 +122,24 @@ export default class MainMenu extends Phaser.Scene {
 
 
 	}
+	mineBlock(blockName: string, x: number, y: number) {
+    // Emit particles directly from the miningParticles object
+    // this.miningParticles.createEmitter({
+    //     x: x,
+    //     y: y,
+    //     speed: { min: 50, max: 150 },
+    //     lifespan: { min: 500, max: 1000 },
+    //     scale: { start: 0.5, end: 0 },
+    //     alpha: { start: 1, end: 0 },
+    //     quantity: 10,
+    //     gravityY: 200
+    // });
+
+    // Add the mined resource to the inventory based on the block name
+    InventoryMenu.addToInventory(blockName, 1); // Add 1 unit of the mined resource
+
+    console.log(`Mined 1 ${blockName}`);
+}
 }
 
 

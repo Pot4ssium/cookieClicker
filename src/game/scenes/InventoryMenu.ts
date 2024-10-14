@@ -16,6 +16,29 @@ export default class InventoryMenu extends Phaser.Scene {
         cable: { count: 0, textObject: null },
     };
 
+    private itemNames: { [key: string]: string } = {
+        'iron_ore': 'Iron Ore',
+        'copper_ore': 'Copper Ore',
+        'rock': 'Rock',
+        'iron_ingot': 'Iron Ingot',
+        'copper_ingot': 'Copper Ingot',
+        'concrete': 'Concrete',
+        'iron_plate': 'Iron Plate',
+        'copper_plate': 'Copper Plate',
+        'iron_rod': 'Iron Rod',
+        'screws': 'Screws',
+        'wire': 'Wire',
+        'cable': 'Cable',
+        'reinforced_iron_plate': 'Reinforced Iron Plate'
+    };
+
+
+
+
+    private floatingTextOffsetY: number = 20; // Y offset for overlapping texts
+    private activeFloatingTexts: Phaser.GameObjects.Text[] = []; // Store active floating texts to manage overlaps
+
+
     constructor() {
         super({ key: 'InventoryMenu' });
     }
@@ -91,19 +114,61 @@ export default class InventoryMenu extends Phaser.Scene {
         }
     }
 
-    // Example method to add resources (this can be triggered from other scenes)
+    displayFloatingTextAtCursor(resource: string, amount: number) {
+        const pointer = this.input.activePointer; // Get the current pointer (cursor) position
+
+        // Calculate the Y position offset to prevent overlap
+        const yOffset = this.activeFloatingTexts.length * this.floatingTextOffsetY;
+
+        // Get the display name from the mapping
+        const displayName = this.itemNames[resource] || resource;
+
+        // Create the text content (e.g., "+1 Iron Ore")
+        const textContent = `${amount > 0 ? '+' : ''}${amount} ${displayName}`;
+
+        // Create the floating text near the cursor
+        const floatingText = this.add.text(pointer.worldX, pointer.worldY - yOffset, textContent, {
+            fontSize: '16px',
+            color: '#ffffff'
+        });
+
+        // Add the floating text to the active list to manage offsets
+        this.activeFloatingTexts.push(floatingText);
+
+        // Apply tween to animate the text
+        this.tweens.add({
+            targets: floatingText,
+            y: pointer.worldY - 50 - yOffset, // Move up by 50 pixels (plus any offset)
+            alpha: 0,  // Fade out the text
+            duration: 1000, // 1 second animation
+            ease: 'Power1',
+            onComplete: () => {
+                floatingText.destroy(); // Destroy the text after the animation
+                this.activeFloatingTexts = this.activeFloatingTexts.filter(text => text !== floatingText); // Remove from active list
+            }
+        });
+    }
+
+    // Method to add resources
     addToInventory(resource: string, amount: number): void {
         if (this.inventory[resource]) {
             this.inventory[resource].count += amount;
             this.inventory[resource].textObject!.setText(`${this.inventory[resource].count}`);
+
+            // Show floating text at the cursor
+            this.displayFloatingTextAtCursor(resource, amount);
         }
     }
 
-    // Example method to deduct resources (this can be triggered from other scenes)
+    // Method to deduct resources
     deductFromInventory(resource: string, amount: number): boolean {
         if (this.inventory[resource] && this.inventory[resource].count >= amount) {
             this.inventory[resource].count -= amount;
             this.inventory[resource].textObject!.setText(`${this.inventory[resource].count}`);
+
+            // Show floating text at the cursor
+            this.displayFloatingTextAtCursor(resource, -amount);
+
             return true;
         }
         return false;
