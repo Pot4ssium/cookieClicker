@@ -6,7 +6,7 @@ export interface Recipe {
 
 export const recipes: Recipe[] = [
     { outputItem: 'iron_ingot', outputAmount: 1, ingredients: [{ item: 'iron_ore', amount: 1 }] },
-    { outputItem: 'copper_ingot', outputAmount: 3, ingredients: [{ item: 'copper_ore', amount: 3 }] },
+    { outputItem: 'copper_ingot', outputAmount: 1, ingredients: [{ item: 'copper_ore', amount: 1 }] },
     { outputItem: 'concrete', outputAmount: 1, ingredients: [{ item: 'rock', amount: 15 }] },
     { outputItem: 'iron_plate', outputAmount: 2, ingredients: [{ item: 'iron_ingot', amount: 3 }] },
     { outputItem: 'iron_rod', outputAmount: 1, ingredients: [{ item: 'iron_ingot', amount: 1 }] },
