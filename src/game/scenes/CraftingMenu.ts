@@ -59,9 +59,12 @@ export default class CraftingMenu extends Phaser.Scene {
             // Create a container for each crafting item
             const itemContainer = this.add.container(300 + (i - startIndex) * 153, 600);
 
-            // Add the item image (replace with your actual image keys)
+            // Add the item image
             const itemImage = this.add.image(35, 0, recipe.outputItem).setScale(4);
             itemContainer.add(itemImage);
+
+            const outputQuantityText = this.add.text(70, -25, `x ${recipe.outputAmount}`, { fontSize: '16px', color: '#ffffff' });
+            itemContainer.add(outputQuantityText);
 
             recipe.ingredients.forEach((ingredient, index) => {
                 // Create a container for each ingredient's cost
@@ -122,7 +125,7 @@ export default class CraftingMenu extends Phaser.Scene {
         // Create the floating text near the cursor
         const floatingText = this.add.text(pointer.worldX, pointer.worldY, "Not enough resources to craft item.", {
             fontSize: '16px',
-            color: '#ffffff'
+            color: '#ff0000'
         });
 
         // Apply tween to animate the text (move up and fade out)

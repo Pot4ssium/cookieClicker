@@ -1,7 +1,9 @@
 import MainMenu from './scenes/MainMenu';
 import CraftingMenu from './scenes/CraftingMenu';
 import InventoryMenu from './scenes/InventoryMenu';
+import MinerPlacementScene from './scenes/MinerPlacementScene';
 import { AUTO, Game } from 'phaser';
+
 
 //  Find out more information about the Game Config at:
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
@@ -15,7 +17,8 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: [
         MainMenu,
         CraftingMenu,
-        InventoryMenu
+        InventoryMenu,
+        MinerPlacementScene
     ]
 };
 

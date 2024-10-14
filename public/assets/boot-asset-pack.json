@@ -77,9 +77,26 @@
                 "key": "iron_rod"
             },
             {
+                "url": [
+                    "assets/mine_sound.mp3"
+                ],
+                "type": "audio",
+                "key": "mine_sound"
+            },
+            {
                 "url": "assets/miner.png",
                 "type": "image",
                 "key": "miner"
+            },
+            {
+                "url": "assets/miner1.png",
+                "type": "image",
+                "key": "miner1"
+            },
+            {
+                "url": "assets/miner2.png",
+                "type": "image",
+                "key": "miner2"
             },
             {
                 "url": "assets/particle.png",
