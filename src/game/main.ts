@@ -1,4 +1,6 @@
 import MainMenu from './scenes/MainMenu';
+import CraftingMenu from './scenes/CraftingMenu';
+import InventoryMenu from './scenes/InventoryMenu';
 import { AUTO, Game } from 'phaser';
 
 //  Find out more information about the Game Config at:
@@ -10,7 +12,9 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: 'game-container',
     backgroundColor: '#028af8',
     scene: [
-        MainMenu
+        MainMenu,
+        CraftingMenu,
+        InventoryMenu
     ]
 };
 
