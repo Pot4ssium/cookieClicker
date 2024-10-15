@@ -2,6 +2,8 @@ import MainMenu from './scenes/MainMenu';
 import CraftingMenu from './scenes/CraftingMenu';
 import InventoryMenu from './scenes/InventoryMenu';
 import MinerPlacementScene from './scenes/MinerPlacementScene';
+import SmelterPlacementScene from './scenes/SmelterPlacementScene';
+import RunningSmeltersScene from './scenes/RunningSmeltersScene'
 import { AUTO, Game } from 'phaser';
 
 
@@ -18,7 +20,9 @@ const config: Phaser.Types.Core.GameConfig = {
         MainMenu,
         CraftingMenu,
         InventoryMenu,
-        MinerPlacementScene
+        MinerPlacementScene,
+        SmelterPlacementScene,
+        RunningSmeltersScene
     ]
 };
 

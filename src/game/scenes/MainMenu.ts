@@ -1,28 +1,19 @@
-// You can write more code here
-
-/* START OF COMPILED CODE */
-
-/* START-USER-IMPORTS */
 import Phaser from "phaser";
 import InventoryMenu from './InventoryMenu';
-/* END-USER-IMPORTS */
 
 export default class MainMenu extends Phaser.Scene {
 	private minerTimers: { [key: string]: Phaser.Time.TimerEvent } = {};
+	private smelterTimers: { [key: string]: Phaser.Time.TimerEvent } = {}; // Track smelter timers
 
 	constructor() {
 		super("Game");
-
-		/* START-USER-CTR-CODE */
-		// Write your code here.
 	}
+
 	preload() {
 		//  The Boot Scene is typically used to load in any assets you require for your Preloader, such as a game logo or background.
 		//  The smaller the file size of the assets, the better, as the Boot Scene itself has no preloader.
-
 		this.load.pack('pack', 'assets/boot-asset-pack.json');
 	}
-	/* END-USER-CTR-CODE */
 
 	editorCreate(): void {
 		const particles = this.add.particles('particle');
@@ -86,11 +77,21 @@ export default class MainMenu extends Phaser.Scene {
 		const smelter = this.add.image(1142, 71, "smelter");
 		smelter.scaleX = 3;
 		smelter.scaleY = 3;
+		smelter.setInteractive();
+		smelter.on('pointerdown', () => {
+			this.scene.launch('SmelterPlacementScene'); // Open smelter placement window
+		});
+		const smelterList = this.add.text(1190, 77, 'List').setInteractive();
+		smelterList.setInteractive();
+		smelterList.on('pointerdown', () => {
+			this.scene.launch('RunningSmeltersScene');
+		});
 
 		// crafter
 		const crafter = this.add.image(1142, 141, "crafter");
 		crafter.scaleX = 3;
 		crafter.scaleY = 3;
+		const crafterList = this.add.text(1190, 147, 'List').setInteractive();
 
 		// miner
 		const miner = this.add.image(1142, 211, "miner");
@@ -110,7 +111,7 @@ export default class MainMenu extends Phaser.Scene {
 		crafter_name.text = "Crafter";
 
 		// miner_name
-		const miner_name = this.add.text(1196, 191, "", {});
+		const miner_name = this.add.text(1188, 191, "", {});
 		miner_name.text = "Miner";
 
 		this.events.emit("scene-awake");
@@ -122,6 +123,7 @@ export default class MainMenu extends Phaser.Scene {
 	create() {
 		this.scene.launch('CraftingMenu');
 		this.scene.launch('InventoryMenu');
+		// this.scene.launch('RunningSmeltersScene');
 		this.editorCreate();
 
 		// Listen for miner placement events from MinerPlacementScene
@@ -137,6 +139,11 @@ export default class MainMenu extends Phaser.Scene {
 			],
 			frameRate: 7, // Adjust frame rate for the speed of the animation
 			repeat: -1 // -1 means loop forever
+		});
+
+		// Listen for the startSmelter event from SmelterPlacementScene
+		this.events.on('startSmelter', (resource: string) => {
+			this.startSmelterTimer(resource);
 		});
 
 
@@ -232,5 +239,75 @@ export default class MainMenu extends Phaser.Scene {
 		};
 
 		return positions[node] || { x: 0, y: 0 }; // Return a default position if the node is unknown
+	}
+
+	startSmelterTimer(resource: string) {
+		const inventoryScene = this.scene.get('InventoryMenu') as InventoryMenu;
+
+		// Automatically smelt resources
+		const smeltInterval = 3000; // Smelting every 3 seconds
+		console.log(`Starting smelter for ${resource}...`);
+
+		this.smelterTimers[resource] = this.time.addEvent({
+			delay: smeltInterval,
+			loop: true,
+			callback: () => {
+				if (resource === 'iron' && inventoryScene.inventory['iron_ore'].count >= 1) {
+					// Deduct iron ore and add iron ingot
+					inventoryScene.inventory['iron_ore'].count -= 1;
+					inventoryScene.inventory['iron_ingot'].count += 1;
+
+					// Update the iron ore and iron ingot count displays
+					inventoryScene.inventory['iron_ore'].textObject!.setText(`${inventoryScene.inventory['iron_ore'].count}`);
+					inventoryScene.inventory['iron_ingot'].textObject!.setText(`${inventoryScene.inventory['iron_ingot'].count}`);
+
+					// Show floating text for iron ingot
+					this.displayFloatingText('Iron Ingot');
+					console.log('Smelting iron ore to iron ingot.');
+
+				} else if (resource === 'copper' && inventoryScene.inventory['copper_ore'].count >= 1) {
+					// Deduct copper ore and add copper ingot
+					inventoryScene.inventory['copper_ore'].count -= 1;
+					inventoryScene.inventory['copper_ingot'].count += 1;
+					inventoryScene.inventory['copper_ore'].textObject!.setText(`${inventoryScene.inventory['copper_ore'].count}`);
+					inventoryScene.inventory['copper_ingot'].textObject!.setText(`${inventoryScene.inventory['copper_ingot'].count}`);
+
+					// Show floating text for copper ingot
+					this.displayFloatingText('Copper Ingot');
+					console.log('Smelting copper ore to copper ingot.');
+
+				} else if (resource === 'rock' && inventoryScene.inventory['rock'].count >= 1) {
+					// Deduct rock and add concrete
+					inventoryScene.inventory['rock'].count -= 1;
+					inventoryScene.inventory['concrete'].count += 1;
+					inventoryScene.inventory['rock'].textObject!.setText(`${inventoryScene.inventory['rock'].count}`);
+					inventoryScene.inventory['concrete'].textObject!.setText(`${inventoryScene.inventory['concrete'].count}`);
+
+					// Show floating text for concrete
+					this.displayFloatingText('Concrete');
+					console.log('Turning rock into concrete.');
+				}
+			}
+		});
+	}
+
+	// Function for floating text
+	displayFloatingText(producedItem: string) {
+		const floatingText = this.add.text(1142, 100, `+1 ${producedItem}`, {
+			fontSize: '16px',
+			color: '#ffffff'
+		});
+
+		// Apply tween to animate the text (move up and fade out)
+		this.tweens.add({
+			targets: floatingText,
+			y: floatingText.y - 50, // Move up by 50 pixels
+			alpha: 0,  // Fade out the text
+			duration: 1000, // 1 second animation
+			ease: 'Power1',
+			onComplete: () => {
+				floatingText.destroy(); // Destroy the text after the animation
+			}
+		});
 	}
 }
