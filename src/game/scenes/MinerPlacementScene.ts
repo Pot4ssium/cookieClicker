@@ -57,7 +57,7 @@ export default class MinerPlacementScene extends Phaser.Scene {
         let miningTime = 0;
         if (!this.minerLevels[node] == 0) {
             miningTime = 3 * (0.5**(this.minerLevels[node] - 1));
-        }
+        } 
         this.minerTimeTexts[node] = this.add.text(nodeImage.x - 40, nodeImage.y + 110, `Time: ${miningTime}s`, {
             fontSize: '20px',
             color: '#ffffff'
