@@ -59,30 +59,30 @@ export default class RunningSmeltersScene extends Phaser.Scene {
 
     // Get list of currently running smelters from SmelterPlacementScene
     getRunningSmelters() {
-    const smelterPlacementScene = this.scene.get('SmelterPlacementScene') as any;
+        const smelterPlacementScene = this.scene.get('SmelterPlacementScene') as any;
 
-    // Debugging
-    if (!smelterPlacementScene) {
-        console.log('SmelterPlacementScene not found.');
-    } else if (!smelterPlacementScene.smelterTimers) {
-        console.log('smelterTimers not found in SmelterPlacementScene.');
-    } else {
-        console.log('SmelterPlacementScene and smelterTimers found.');
+        // Debugging
+        if (!smelterPlacementScene) {
+            console.log('SmelterPlacementScene not found.');
+        } else if (!smelterPlacementScene.smelterTimers) {
+            console.log('smelterTimers not found in SmelterPlacementScene.');
+        } else {
+            console.log('SmelterPlacementScene and smelterTimers found.');
+        }
+
+        if (smelterPlacementScene && smelterPlacementScene.smelterTimers) {
+            const smelterNodes = ['iron', 'copper', 'rock']; // Example smelter nodes
+            const smelterTimers = smelterPlacementScene.smelterTimers;
+
+            // Log smelterTimers to debug
+            console.log(smelterTimers);
+
+            // Return only the smelters that have running timers
+            return smelterNodes.filter(node => smelterTimers[node]);
+        } else {
+            return [];
+        }
     }
-
-    if (smelterPlacementScene && smelterPlacementScene.smelterTimers) {
-        const smelterNodes = ['iron', 'copper', 'rock']; // Example smelter nodes
-        const smelterTimers = smelterPlacementScene.smelterTimers;
-
-        // Log smelterTimers to debug
-        console.log(smelterTimers);
-
-        // Return only the smelters that have running timers
-        return smelterNodes.filter(node => smelterTimers[node]);
-    } else {
-        return [];
-    }
-}
 
     // Switch between pages (-1 for left, 1 for right)
     switchPage(direction: number) {
